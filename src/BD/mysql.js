@@ -1,3 +1,9 @@
+const config = require('../config')
+
+const dbconfig = {
+    host:config.mysql.host
+}
+
 function todos(tabla){
     const mensaje = 'Soy consulta todos y esta es la tabla a consultar: ' + tabla
     return mensaje
