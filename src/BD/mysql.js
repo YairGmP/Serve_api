@@ -1,5 +1,5 @@
-const mysql = require('mysql2')
-const config = require('../config')
+const config = require('../config');
+const mysql = require('mysql')
 
 const dbconfig = {
     host:config.mysql.host,
@@ -9,8 +9,9 @@ const dbconfig = {
 
 }
 
+
 function conMysql(){
-    const conexion = mysql.createConnection(dbconfig);
+    conexion = mysql.createConnection(dbconfig);
     conexion.connect((err)=>{
         if(err){
             console.log('[BD err]', err)
@@ -32,26 +33,65 @@ function conMysql(){
 conMysql()
 
 function todos(tabla){
-    const mensaje = 'Soy consulta todos y esta es la tabla a consultar: ' + tabla
-    return mensaje
+    return new Promise ((resolve, reeject)=>{
+        conexion.query(`SELECT * FROM ${tabla}`, (error, result)=>{
+            return error ? reeject(error) : resolve(result)
+        })
+    })
 
 }
 
 function uno(tabla, id){
-
+    return new Promise((resolve, reject) => {
+        conexion.query(`SELECT * FROM ${tabla} WHERE id =${id};`, (error, result) => {
+          return error ? reject(error) : resolve(result);
+        });
+      });
 }
 
-function agregar(tabla, data){
-    const datos = {
-        tabla: tabla,
-        data: data
+function insertar(tabla, data) {
+    return new Promise((resolve, reject) => {
+        conexion.query(`INSERT INTO ${tabla} SET ?`, data, (error, result) => {
+            return error ? reject(error) : resolve(result);
+        });
+    });
+}
+
+function actualizar(tabla, data) {
+    return new Promise((resolve, reject) => {
+        conexion.query(`UPDATE ${tabla} SET ? WHERE id = ?`, [data, data.id], (error, result) => {
+            return error ? reject(error) : resolve(result);
+        });
+    });
+}
+
+function agregar(tabla, data) {
+    if (data && data.id == 0) {
+        return insertar(tabla, data);
+    } else {
+        return actualizar(tabla, data);
     }
-    return(datos)
 }
 
-function eliminar(tabla, id){
-
+function eliminar(tabla, data) {
+    return new Promise((resolve, reject) => {
+        conexion.query(`DELETE FROM ${tabla} WHERE id = ?`, data.id, (error, result) => {
+            return error ? reject(error) : resolve(result);
+        });
+    });
 }
+
+// function agregar(tabla, data){
+//     const datos = {
+//         tabla: tabla,
+//         data: data
+//     }
+//     return(datos)
+// }
+
+// function eliminar(tabla, id){
+
+// }
 
 module.exports = {
     todos, uno, agregar, eliminar

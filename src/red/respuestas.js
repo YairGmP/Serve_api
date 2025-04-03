@@ -1,5 +1,3 @@
-const { error } = require("./respuestas");
-
 exports.success = function (req, res, status = 200, msg = '') {
   res.status(status).send({
     status: status,
